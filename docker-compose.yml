@@ -1,0 +1,36 @@
+version: '3.1'
+services:
+  api:
+    container_name: github_api
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - /opt/workspace/PYTHON/captalys/:/opt/api/
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_USER_FILE: /run/secrets/db_username
+      POSTGRES_DB: github
+    secrets:
+      - db_password
+      - db_username
+  db:
+    container_name: github_db
+    image: postgres:12.3-alpine
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_USER_FILE: /run/secrets/db_username
+      POSTGRES_DB: github
+    secrets:
+      - db_password
+      - db_username
+
+secrets:
+  db_password:
+    file: .secrets/db_password.txt
+  db_username:
+    file: .secrets/db_username.txt
